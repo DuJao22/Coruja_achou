@@ -1,0 +1,6 @@
+{
+  "name": "Coruja Achou",
+  "description": "Plataforma profissional de descoberta de produtos e achadinhos com vitrine editorial e painel administrativo.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

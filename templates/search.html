@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Busca: "{{ query }}" | CORUJA ACHOU{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+  <!-- Search Header Bar -->
+  <div class="p-6 sm:p-8 rounded-3xl bg-[#111318] border border-[#242832]">
+    <div class="max-w-2xl mx-auto text-center space-y-4">
+      <h1 class="text-xl sm:text-3xl font-extrabold text-white">
+        Resultados para: <span class="text-amber-400 font-mono">"{{ query }}"</span>
+      </h1>
+      
+      <!-- Search Input Form -->
+      <form action="/buscar" method="GET" class="relative max-w-xl mx-auto">
+        <input 
+          type="text" 
+          name="q" 
+          value="{{ query }}"
+          placeholder="Pesquisar outro produto..." 
+          class="w-full bg-[#08090C] border border-[#242832] rounded-2xl py-3 pl-4 pr-12 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+        >
+        <button type="submit" class="absolute right-3 top-1/2 -translate-y-1/2 px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold transition-colors">
+          Buscar
+        </button>
+      </form>
+
+      <p class="text-xs text-zinc-400">
+        {{ products|length }} achado(s) encontrado(s)
+      </p>
+    </div>
+  </div>
+
+  <!-- Products Results Grid -->
+  {% if products %}
+  <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3.5 sm:gap-6">
+    {% for product in products %}
+      {% include 'components/product_card.html' %}
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="p-12 text-center bg-[#111318] rounded-3xl border border-[#242832] max-w-md mx-auto my-12 space-y-4">
+    <div class="text-5xl">🦉</div>
+    <h3 class="text-lg font-bold text-white">Nenhum achadinho encontrado</h3>
+    <p class="text-sm text-zinc-400">
+      Não encontramos produtos correspondentes a "{{ query }}". Tente buscar por palavras-chave mais genéricas ou navegue pelas categorias.
+    </p>
+    <a href="/" class="inline-block px-5 py-2.5 rounded-xl bg-purple-600 text-white text-xs font-bold hover:bg-purple-500 transition-colors">
+      Voltar para Início
+    </a>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

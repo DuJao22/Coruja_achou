@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Painel Administrativo | CORUJA ACHOU{% endblock %}</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            admin: {
+              bg: '#0a0c10',
+              card: '#12151c',
+              border: '#232834',
+              purple: '#8B5CF6',
+              gold: '#F59E0B'
+            }
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Custom styles -->
+  <link rel="stylesheet" href="/static/css/style.css">
+  <link rel="icon" type="image/svg+xml" href="/static/images/coruja-logo.svg">
+  {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-[#0a0c10] text-zinc-100 min-h-screen flex flex-col md:flex-row antialiased">
+
+  <!-- Mobile Admin Top Bar -->
+  <div class="md:hidden flex items-center justify-between px-4 py-3 bg-[#12151c] border-b border-[#232834]">
+    <a href="/admin" class="flex items-center gap-2">
+      <span class="text-xl">🦉</span>
+      <span class="font-extrabold text-sm tracking-tight text-white">CORUJA <span class="text-amber-400">ADMIN</span></span>
+    </a>
+    <div class="flex items-center gap-2">
+      <a href="/" target="_blank" class="text-xs px-2.5 py-1 rounded-lg bg-[#1a1f2c] text-zinc-300 border border-[#232834]">
+        Vitrine ↗
+      </a>
+      <a href="/admin/logout" class="text-xs px-2.5 py-1 rounded-lg bg-rose-950/40 text-rose-300 border border-rose-800/40">
+        Sair
+      </a>
+    </div>
+  </div>
+
+  <!-- Mobile Bottom Nav -->
+  <div class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#12151c]/95 backdrop-blur-md border-t border-[#232834] flex items-center justify-around py-2">
+    <a href="/admin" class="flex flex-col items-center text-[10px] {{ 'text-purple-400 font-bold' if request.path == '/admin' else 'text-zinc-400' }}">
+      <span class="text-base">📊</span>
+      <span>Dashboard</span>
+    </a>
+    <a href="/admin/products" class="flex flex-col items-center text-[10px] {{ 'text-purple-400 font-bold' if '/admin/products' in request.path else 'text-zinc-400' }}">
+      <span class="text-base">📦</span>
+      <span>Produtos</span>
+    </a>
+    <a href="/admin/categories" class="flex flex-col items-center text-[10px] {{ 'text-purple-400 font-bold' if '/admin/categories' in request.path else 'text-zinc-400' }}">
+      <span class="text-base">📂</span>
+      <span>Categorias</span>
+    </a>
+    <a href="/admin/settings" class="flex flex-col items-center text-[10px] {{ 'text-purple-400 font-bold' if '/admin/settings' in request.path else 'text-zinc-400' }}">
+      <span class="text-base">⚙️</span>
+      <span>Ajustes</span>
+    </a>
+  </div>
+
+  <!-- Desktop Sidebar Navigation -->
+  <aside class="hidden md:flex flex-col w-64 bg-[#12151c] border-r border-[#232834] p-5 shrink-0 min-h-screen">
+    
+    <!-- Logo & Brand Header -->
+    <div class="flex items-center gap-3 pb-6 border-b border-[#232834] mb-6">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-700 p-1 flex items-center justify-center shadow-lg shadow-purple-600/20">
+        <img src="/static/images/coruja-logo.svg" alt="Coruja Logo" class="w-full h-full object-contain">
+      </div>
+      <div>
+        <h1 class="font-extrabold text-base tracking-tight text-white leading-tight">
+          CORUJA <span class="text-amber-400">ACHOU</span>
+        </h1>
+        <span class="text-[10px] font-mono uppercase tracking-wider text-purple-400 bg-purple-950/60 px-1.5 py-0.5 rounded border border-purple-500/20">
+          Painel Gestor
+        </span>
+      </div>
+    </div>
+
+    <!-- Navigation Menu Items -->
+    <nav class="flex-1 space-y-1.5 text-sm font-medium">
+      <a 
+        href="/admin" 
+        class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all {{ 'bg-purple-600 text-white shadow-lg shadow-purple-600/25 font-semibold' if request.path == '/admin' else 'text-zinc-400 hover:text-white hover:bg-[#1a1f2c]' }}"
+      >
+        <span class="text-base">📊</span>
+        <span>Dashboard</span>
+      </a>
+
+      <a 
+        href="/admin/products" 
+        class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all {{ 'bg-purple-600 text-white shadow-lg shadow-purple-600/25 font-semibold' if '/admin/products' in request.path else 'text-zinc-400 hover:text-white hover:bg-[#1a1f2c]' }}"
+      >
+        <span class="text-base">📦</span>
+        <span>Produtos</span>
+      </a>
+
+      <a 
+        href="/admin/categories" 
+        class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all {{ 'bg-purple-600 text-white shadow-lg shadow-purple-600/25 font-semibold' if '/admin/categories' in request.path else 'text-zinc-400 hover:text-white hover:bg-[#1a1f2c]' }}"
+      >
+        <span class="text-base">📂</span>
+        <span>Categorias</span>
+      </a>
+
+      <a 
+        href="/admin/settings" 
+        class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all {{ 'bg-purple-600 text-white shadow-lg shadow-purple-600/25 font-semibold' if '/admin/settings' in request.path else 'text-zinc-400 hover:text-white hover:bg-[#1a1f2c]' }}"
+      >
+        <span class="text-base">⚙️</span>
+        <span>Configurações</span>
+      </a>
+    </nav>
+
+    <!-- Bottom Actions -->
+    <div class="pt-6 border-t border-[#232834] space-y-3">
+      <!-- Public Site Link -->
+      <a 
+        href="/" 
+        target="_blank" 
+        class="flex items-center justify-between px-3 py-2 rounded-xl bg-[#0a0c10] border border-[#232834] text-xs font-semibold text-zinc-300 hover:text-purple-300 hover:border-purple-500/40 transition-all"
+      >
+        <span class="flex items-center gap-2">
+          <span>👀</span> Ver Vitrine Pública
+        </span>
+        <span>↗</span>
+      </a>
+
+      <!-- Logout -->
+      <a 
+        href="/admin/logout" 
+        class="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-rose-400 hover:bg-rose-950/30 transition-all"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+        <span>Encerrar Sessão</span>
+      </a>
+    </div>
+
+  </aside>
+
+  <!-- Main Content Area -->
+  <main class="flex-1 p-4 sm:p-6 lg:p-8 pb-20 md:pb-8 overflow-y-auto max-w-7xl">
+    
+    <!-- Flash Messages in Admin -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="mb-6 space-y-2">
+          {% for category, message in messages %}
+            <div class="p-4 rounded-xl text-sm font-medium flex items-center justify-between border {{ 'bg-emerald-950/80 text-emerald-200 border-emerald-500/30' if category == 'success' else ('bg-rose-950/80 text-rose-200 border-rose-500/30' if category == 'error' else 'bg-[#1a1f2c] text-zinc-200 border-[#232834]') }}">
+              <div class="flex items-center gap-2">
+                <span>{{ '🦉' if category == 'success' else '⚠️' }}</span>
+                <span>{{ message }}</span>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+  <script src="/static/js/admin.js"></script>
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>

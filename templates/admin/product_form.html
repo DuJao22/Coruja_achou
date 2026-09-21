@@ -1,0 +1,392 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block title %}{{ 'Editar Produto' if product else 'Novo Produto' }} | CORUJA ACHOU ADMIN{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-6">
+
+  <!-- Header Breadcrumb & Title -->
+  <div class="flex items-center justify-between pb-4 border-b border-[#232834]">
+    <div>
+      <div class="text-xs text-zinc-500 mb-1">
+        <a href="/admin/products" class="hover:text-purple-400">Produtos</a> /
+        <span>{{ 'Editar' if product else 'Cadastrar' }}</span>
+      </div>
+      <h1 class="text-2xl font-extrabold text-white tracking-tight flex items-center gap-2">
+        <span>{{ '✏️' if product else '✨' }}</span>
+        <span>{{ 'Editar Produto' if product else 'Cadastrar Novo Produto' }}</span>
+      </h1>
+    </div>
+
+    <a href="/admin/products" class="px-3 py-1.5 rounded-xl bg-[#1a1f2c] text-zinc-400 hover:text-white border border-[#232834] text-xs font-semibold">
+      ← Voltar à lista
+    </a>
+  </div>
+
+  <!-- Form Container -->
+  <form 
+    method="POST" 
+    enctype="multipart/form-data" 
+    class="space-y-8 bg-[#12151c] p-6 sm:p-8 rounded-3xl border border-[#232834] shadow-2xl"
+  >
+
+    <!-- SECTION 1: DADOS BÁSICOS -->
+    <div class="space-y-4">
+      <h3 class="text-xs font-bold uppercase tracking-wider text-purple-400 pb-2 border-b border-[#232834] flex items-center gap-1.5">
+        <span>1.</span> Identificação do Produto
+      </h3>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <!-- Nome -->
+        <div class="sm:col-span-2">
+          <label for="nameInput" class="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1.5">
+            Nome do Produto <span class="text-rose-500">*</span>
+          </label>
+          <input 
+            type="text" 
+            id="nameInput" 
+            name="name" 
+            value="{{ product.name if product else '' }}" 
+            required 
+            placeholder="ex: Mini Projetor Portátil 4K Smart Cinema"
+            class="w-full bg-[#0a0c10] border border-[#232834] rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-purple-500"
+          >
+        </div>
+
+        <!-- Slug (Auto Gerado) -->
+        <div>
+          <label for="slugInput" class="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1.5">
+            Slug na URL (Automático)
+          </label>
+          <input 
+            type="text" 
+            id="slugInput" 
+            name="slug" 
+            value="{{ product.slug if product else '' }}" 
+            placeholder="mini-projetor-portatil-4k"
+            class="w-full bg-[#0a0c10] border border-[#232834] rounded-xl px-4 py-2.5 text-xs font-mono text-amber-400 placeholder-zinc-600 focus:outline-none focus:border-purple-500"
+          >
+          <span class="text-[10px] text-zinc-500 mt-1 block">Gerado automaticamente a partir do nome. Pode ser customizado.</span>
+        </div>
+
+        <!-- Categoria -->
+        <div>
+          <label for="categorySelect" class="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1.5">
+            Categoria <span class="text-rose-500">*</span>
+          </label>
+          <select 
+            id="categorySelect" 
+            name="category_id" 
+            required
+            class="w-full bg-[#0a0c10] border border-[#232834] rounded-xl px-4 py-2.5 text-sm text-zinc-200 focus:outline-none focus:border-purple-500"
+          >
+            <option value="">Selecione uma categoria...</option>
+            {% for cat in categories %}
+            <option value="{{ cat.id }}" {{ 'selected' if (product and product.category_id == cat.id) else '' }}>
+              {{ cat.icon }} {{ cat.name }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <!-- Descrição Curta -->
+      <div>
+        <label for="shortDescription" class="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1.5">
+          Descrição Curta (Resumo de impacto para cards e SEO)
+        </label>
+        <input 
+          type="text" 
+          id="shortDescription" 
+          name="short_description" 
+          value="{{ product.short_description if product else '' }}" 
+          placeholder="ex: Transforme qualquer parede em uma tela de 130 polegadas com conexão Wi-Fi."
+          class="w-full bg-[#0a0c10] border border-[#232834] rounded-xl px-4 py-2.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-purple-500"
+        >
+      </div>
+
+      <!-- Descrição Completa -->
+      <div>
+        <label for="fullDescription" class="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1.5">
+          Descrição Completa / Opinião da Coruja
+        </label>
+        <textarea 
+          id="fullDescription" 
+          name="description" 
+          rows="4"
+          placeholder="Descreva detalhes, benefícios práticos, por que o produto é interessante e como funciona..."
+          class="w-full bg-[#0a0c10] border border-[#232834] rounded-xl p-4 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-purple-500 leading-relaxed"
+        >{{ product.description if product else '' }}</textarea>
+      </div>
+    </div>
+
+    <!-- SECTION 2: IMAGENS & PREVIEWS -->
+    <div class="space-y-4">
+      <h3 class="text-xs font-bold uppercase tracking-wider text-purple-400 pb-2 border-b border-[#232834] flex items-center gap-1.5">
+        <span>2.</span> Imagens do Produto & Pré-visualização
+      </h3>
+
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+        
+        <!-- Image Inputs (Cols 1 to 8) -->
+        <div class="md:col-span-8 space-y-4">
+          <!-- Main Image URL or Upload -->
+          <div>
+            <label class="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1">
+              Imagem Principal (Upload de Arquivo)
+            </label>
+            <input 
+              type="file" 
+              id="imageFileInput" 
+              name="image_file" 
+              accept="image/*"
+              class="w-full text-xs text-zinc-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-purple-600 file:text-white hover:file:bg-purple-500 cursor-pointer bg-[#0a0c10] p-2 rounded-xl border border-[#232834]"
+            >
+          </div>
+
+          <div>
+            <label for="imageUrlInput" class="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1">
+              Ou URL Direta da Imagem Principal
+            </label>
+            <input 
+              type="url" 
+              id="imageUrlInput" 
+              name="image_url" 
+              value="{{ product.image if product else '' }}" 
+              placeholder="https://images.unsplash.com/... ou https://..."
+              class="w-full bg-[#0a0c10] border border-[#232834] rounded-xl px-4 py-2.5 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-purple-500"
+            >
+            <span class="text-[10px] text-zinc-500 block mt-1">Você pode tanto carregar um arquivo quanto colar o link de uma imagem externa.</span>
+          </div>
+
+          <!-- Additional Images URLs -->
+          <div>
+            <label for="additionalImagesUrls" class="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1">
+              Imagens Adicionais (URLs - uma por linha)
+            </label>
+            <textarea 
+              id="additionalImagesUrls" 
+              name="additional_images_urls" 
+              rows="2"
+              placeholder="https://...
+https://..."
+              class="w-full bg-[#0a0c10] border border-[#232834] rounded-xl p-3 text-xs font-mono text-zinc-300 placeholder-zinc-600 focus:outline-none focus:border-purple-500"
+            >{% if product and product.additional_images_list %}{{ product.additional_images_list|join('\n') }}{% endif %}</textarea>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1">
+              Upload de Imagens Adicionais (Múltiplos Arquivos)
+            </label>
+            <input 
+              type="file" 
+              name="additional_files" 
+              accept="image/*" 
+              multiple
+              class="w-full text-xs text-zinc-400 file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-[#1a1f2c] file:text-zinc-200 hover:file:bg-[#232834] cursor-pointer bg-[#0a0c10] p-2 rounded-xl border border-[#232834]"
+            >
+          </div>
+        </div>
+
+        <!-- Live Image Preview Card (Cols 9 to 12) -->
+        <div class="md:col-span-4 p-4 rounded-2xl bg-[#0a0c10] border border-[#232834] text-center space-y-2">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-400 block">Preview da Imagem</span>
+          <div class="w-full aspect-square rounded-xl overflow-hidden bg-[#12151c] border border-[#232834] flex items-center justify-center relative">
+            <img 
+              id="imagePreview" 
+              src="{{ product.image if product and product.image else '' }}" 
+              alt="Preview" 
+              class="w-full h-full object-cover {{ '' if product and product.image else 'hidden' }}"
+            >
+            <div id="imagePreviewPlaceholder" class="{{ 'hidden' if product and product.image else 'flex flex-col items-center justify-center p-4 text-zinc-600' }}">
+              <span class="text-3xl mb-1">🖼️</span>
+              <span class="text-[11px]">Sem imagem</span>
+            </div>
+          </div>
+          <span class="text-[10px] text-zinc-500 block">Otimizado para proporção 1:1</span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SECTION 3: PREÇOS, SCORE & METRICAS -->
+    <div class="space-y-4">
+      <h3 class="text-xs font-bold uppercase tracking-wider text-purple-400 pb-2 border-b border-[#232834] flex items-center gap-1.5">
+        <span>3.</span> Valores, Score da Coruja & Vendas
+      </h3>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        <!-- Preço Atual -->
+        <div>
+          <label for="priceInput" class="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1.5">
+            Preço Atual (R$) <span class="text-rose-500">*</span>
+          </label>
+          <input 
+            type="text" 
+            id="priceInput" 
+            name="price" 
+            value="{{ product.price if product else '' }}" 
+            required 
+            placeholder="ex: 279.90"
+            class="w-full bg-[#0a0c10] border border-[#232834] rounded-xl px-4 py-2.5 text-sm font-mono font-bold text-white focus:outline-none focus:border-purple-500"
+          >
+        </div>
+
+        <!-- Preço Anterior -->
+        <div>
+          <label for="oldPriceInput" class="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1.5">
+            Preço Anterior (R$)
+          </label>
+          <input 
+            type="text" 
+            id="oldPriceInput" 
+            name="old_price" 
+            value="{{ product.old_price if product and product.old_price else '' }}" 
+            placeholder="ex: 499.00"
+            class="w-full bg-[#0a0c10] border border-[#232834] rounded-xl px-4 py-2.5 text-sm font-mono text-zinc-400 focus:outline-none focus:border-purple-500"
+          >
+          <div class="mt-1 hidden">
+            <span id="discountDisplay" class="text-[10px] font-black text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded"></span>
+          </div>
+        </div>
+
+        <!-- Score da Coruja -->
+        <div>
+          <label for="trendScore" class="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1.5">
+            Score da Coruja (0 - 100) 🦉
+          </label>
+          <input 
+            type="number" 
+            id="trendScore" 
+            name="trend_score" 
+            min="0" 
+            max="100" 
+            value="{{ product.trend_score if product else 88 }}" 
+            class="w-full bg-[#0a0c10] border border-[#232834] rounded-xl px-4 py-2.5 text-sm font-mono font-bold text-amber-400 focus:outline-none focus:border-purple-500"
+          >
+          <span class="text-[10px] text-zinc-500 mt-0.5 block">Índice de tendência / viralidade</span>
+        </div>
+
+        <!-- Avaliação -->
+        <div>
+          <label for="ratingInput" class="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1.5">
+            Avaliação (1.0 - 5.0) ⭐
+          </label>
+          <input 
+            type="text" 
+            id="ratingInput" 
+            name="rating" 
+            value="{{ product.rating if product else '4.9' }}" 
+            placeholder="4.9"
+            class="w-full bg-[#0a0c10] border border-[#232834] rounded-xl px-4 py-2.5 text-sm font-mono text-amber-300 focus:outline-none focus:border-purple-500"
+          >
+        </div>
+
+        <!-- Quantidade de Vendas -->
+        <div>
+          <label for="salesInput" class="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1.5">
+            Qtd. de Vendas Aprox.
+          </label>
+          <input 
+            type="number" 
+            id="salesInput" 
+            name="sales_count" 
+            value="{{ product.sales_count if product else 1500 }}" 
+            class="w-full bg-[#0a0c10] border border-[#232834] rounded-xl px-4 py-2.5 text-sm font-mono text-zinc-200 focus:outline-none focus:border-purple-500"
+          >
+        </div>
+
+        <!-- Link de Afiliado -->
+        <div class="sm:col-span-2 md:col-span-3">
+          <label for="affiliateUrl" class="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1.5">
+            Link de Afiliado / Loja Parceira <span class="text-rose-500">*</span>
+          </label>
+          <input 
+            type="url" 
+            id="affiliateUrl" 
+            name="affiliate_url" 
+            value="{{ product.affiliate_url if product else '' }}" 
+            required 
+            placeholder="https://shopee.com.br/... ou https://amzn.to/... ou link de afiliado"
+            class="w-full bg-[#0a0c10] border border-[#232834] rounded-xl px-4 py-2.5 text-xs text-purple-300 font-mono placeholder-zinc-600 focus:outline-none focus:border-purple-500"
+          >
+          <span class="text-[10px] text-zinc-500 mt-0.5 block">O botão "VER OFERTA" da vitrine abrirá diretamente este link.</span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SECTION 4: FLAGS / STATUS -->
+    <div class="space-y-4">
+      <h3 class="text-xs font-bold uppercase tracking-wider text-purple-400 pb-2 border-b border-[#232834] flex items-center gap-1.5">
+        <span>4.</span> Exibição e Destaque na Vitrine
+      </h3>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        
+        <!-- Destaque -->
+        <label class="flex items-center gap-3 p-4 rounded-2xl bg-[#0a0c10] border border-[#232834] cursor-pointer hover:border-purple-500/50 transition-colors">
+          <input 
+            type="checkbox" 
+            name="featured" 
+            value="1" 
+            {{ 'checked' if (product and product.featured) else '' }}
+            class="w-5 h-5 rounded-lg text-purple-600 focus:ring-purple-500 bg-[#12151c] border-[#232834]"
+          >
+          <div>
+            <span class="text-xs font-bold text-white block">🦉 Produto em Destaque</span>
+            <span class="text-[11px] text-zinc-400">Exibir em "Achados de Hoje" no topo</span>
+          </div>
+        </label>
+
+        <!-- Em Alta -->
+        <label class="flex items-center gap-3 p-4 rounded-2xl bg-[#0a0c10] border border-[#232834] cursor-pointer hover:border-amber-500/50 transition-colors">
+          <input 
+            type="checkbox" 
+            name="trending" 
+            value="1" 
+            {{ 'checked' if (product and product.trending) else '' }}
+            class="w-5 h-5 rounded-lg text-amber-500 focus:ring-amber-400 bg-[#12151c] border-[#232834]"
+          >
+          <div>
+            <span class="text-xs font-bold text-white block">🔥 Produto em Alta</span>
+            <span class="text-[11px] text-zinc-400">Exibir na seção "Produtos em Alta"</span>
+          </div>
+        </label>
+
+        <!-- Ativo -->
+        <label class="flex items-center gap-3 p-4 rounded-2xl bg-[#0a0c10] border border-[#232834] cursor-pointer hover:border-emerald-500/50 transition-colors">
+          <input 
+            type="checkbox" 
+            name="active" 
+            value="1" 
+            {{ 'checked' if (not product or product.active) else '' }}
+            class="w-5 h-5 rounded-lg text-emerald-500 focus:ring-emerald-400 bg-[#12151c] border-[#232834]"
+          >
+          <div>
+            <span class="text-xs font-bold text-white block">✅ Produto Ativo</span>
+            <span class="text-[11px] text-zinc-400">Visível publicamente para visitantes</span>
+          </div>
+        </label>
+
+      </div>
+    </div>
+
+    <!-- Submit Button Bar -->
+    <div class="pt-6 border-t border-[#232834] flex items-center justify-end gap-3">
+      <a href="/admin/products" class="px-5 py-2.5 rounded-xl bg-[#1a1f2c] text-zinc-400 hover:text-white border border-[#232834] text-xs font-semibold">
+        Cancelar
+      </a>
+      <button 
+        type="submit" 
+        class="px-7 py-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-sm shadow-xl shadow-purple-600/30 active:scale-[0.98] transition-all flex items-center gap-2"
+      >
+        <span>🦉</span>
+        <span>{{ 'SALVAR ALTERAÇÕES' if product else 'CADASTRAR PRODUTO' }}</span>
+      </button>
+    </div>
+
+  </form>
+
+</div>
+{% endblock %}

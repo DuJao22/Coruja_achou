@@ -1,0 +1,51 @@
+<!-- Horizontal Category Pills Scroll -->
+<div class="relative w-full py-4 group">
+  <!-- Left Scroll Arrow (Desktop) -->
+  <button 
+    id="scrollCatsLeft" 
+    type="button" 
+    class="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-[#111318]/90 border border-[#242832] text-zinc-300 hover:text-white items-center justify-center shadow-lg hover:border-purple-500/50 transition-all opacity-0 group-hover:opacity-100"
+    aria-label="Rolar para esquerda"
+  >
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+  </button>
+
+  <div 
+    id="categoryScroll" 
+    class="flex items-center gap-2.5 overflow-x-auto no-scrollbar scroll-smooth px-4 sm:px-0 py-1"
+  >
+    <!-- All / Todos -->
+    <a 
+      href="/" 
+      class="shrink-0 px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 touch-target {{ 'bg-purple-600 text-white shadow-lg shadow-purple-600/30' if not active_category else 'bg-[#111318] text-zinc-300 border border-[#242832] hover:border-purple-500/40 hover:text-white' }}"
+    >
+      <span>✨</span>
+      <span>Todos</span>
+    </a>
+
+    {% for cat in nav_categories %}
+    <a 
+      href="/categoria/{{ cat.slug }}" 
+      class="shrink-0 px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 touch-target {{ 'bg-purple-600 text-white shadow-lg shadow-purple-600/30 border-purple-500' if active_category == cat.slug else 'bg-[#111318] text-zinc-300 border border-[#242832] hover:border-purple-500/40 hover:text-white' }}"
+    >
+      <span class="text-base">{{ cat.icon }}</span>
+      <span>{{ cat.name.replace(cat.icon, '')|trim }}</span>
+      {% if cat.product_count is defined and cat.product_count > 0 %}
+      <span class="text-[10px] px-1.5 py-0.5 rounded-full {{ 'bg-purple-800 text-purple-200' if active_category == cat.slug else 'bg-[#242832] text-zinc-400' }}">
+        {{ cat.product_count }}
+      </span>
+      {% endif %}
+    </a>
+    {% endfor %}
+  </div>
+
+  <!-- Right Scroll Arrow (Desktop) -->
+  <button 
+    id="scrollCatsRight" 
+    type="button" 
+    class="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-[#111318]/90 border border-[#242832] text-zinc-300 hover:text-white items-center justify-center shadow-lg hover:border-purple-500/50 transition-all opacity-0 group-hover:opacity-100"
+    aria-label="Rolar para direita"
+  >
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+  </button>
+</div>

@@ -1,0 +1,241 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block title %}Configurações da Vitrine | CORUJA ACHOU ADMIN{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto space-y-8">
+
+  <!-- Header -->
+  <div class="pb-4 border-b border-[#232834]">
+    <h1 class="text-2xl font-extrabold text-white tracking-tight flex items-center gap-2">
+      <span>⚙️</span>
+      <span>Configurações da Vitrine & Redes Sociais</span>
+    </h1>
+    <p class="text-xs text-zinc-400 mt-1">
+      Personalize a identidade da sua vitrine editorial e altere dados de acesso administrativo.
+    </p>
+  </div>
+
+  <!-- General Settings Form -->
+  <form method="POST" action="/admin/settings" class="space-y-6 bg-[#12151c] p-6 sm:p-8 rounded-3xl border border-[#232834] shadow-2xl">
+    <input type="hidden" name="action" value="update_settings">
+
+    <h2 class="text-sm font-bold uppercase tracking-wider text-purple-400 pb-2 border-b border-[#232834] flex items-center gap-2">
+      <span>🏷️</span> Identidade e Textos
+    </h2>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      
+      <!-- Nome do Site -->
+      <div>
+        <label for="siteName" class="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1.5">
+          Nome da Vitrine
+        </label>
+        <input 
+          type="text" 
+          id="siteName" 
+          name="site_name" 
+          value="{{ settings.get('site_name', 'CORUJA ACHOU') }}" 
+          required
+          class="w-full bg-[#0a0c10] border border-[#232834] rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500"
+        >
+      </div>
+
+      <!-- Moeda -->
+      <div>
+        <label for="currencySymbol" class="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1.5">
+          Moeda Padrão
+        </label>
+        <input 
+          type="text" 
+          id="currencySymbol" 
+          name="currency" 
+          value="{{ settings.get('currency', 'R$') }}" 
+          required
+          class="w-full bg-[#0a0c10] border border-[#232834] rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500"
+        >
+      </div>
+
+      <!-- Slogan -->
+      <div class="sm:col-span-2">
+        <label for="siteSlogan" class="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1.5">
+          Slogan do Projeto
+        </label>
+        <input 
+          type="text" 
+          id="siteSlogan" 
+          name="slogan" 
+          value="{{ settings.get('slogan', 'A coruja encontrou. Agora é sua vez.') }}" 
+          required
+          class="w-full bg-[#0a0c10] border border-[#232834] rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500"
+        >
+      </div>
+
+      <!-- Descrição SEO -->
+      <div class="sm:col-span-2">
+        <label for="siteDesc" class="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1.5">
+          Descrição Institucional (SEO & Compartilhamento)
+        </label>
+        <textarea 
+          id="siteDesc" 
+          name="description" 
+          rows="2"
+          class="w-full bg-[#0a0c10] border border-[#232834] rounded-xl p-3 text-sm text-white focus:outline-none focus:border-purple-500"
+        >{{ settings.get('description', 'Achados, tendências e produtos interessantes reunidos em um só lugar.') }}</textarea>
+      </div>
+
+      <!-- Texto do Rodapé -->
+      <div class="sm:col-span-2">
+        <label for="footerText" class="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1.5">
+          Texto de Direitos do Rodapé
+        </label>
+        <input 
+          type="text" 
+          id="footerText" 
+          name="footer_text" 
+          value="{{ settings.get('footer_text', '© 2026 CORUJA ACHOU. Vitrine editorial de achadinhos.') }}" 
+          class="w-full bg-[#0a0c10] border border-[#232834] rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500"
+        >
+      </div>
+
+    </div>
+
+    <!-- Redes Sociais & Links de Conversão -->
+    <h2 class="text-sm font-bold uppercase tracking-wider text-purple-400 pt-4 pb-2 border-b border-[#232834] flex items-center gap-2">
+      <span>📱</span> Redes Sociais & Canais de Tráfego
+    </h2>
+
+    <div class="space-y-4">
+      
+      <!-- Instagram -->
+      <div>
+        <label for="instagramLink" class="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1">
+          Link do Instagram (Principal fonte de tráfego)
+        </label>
+        <div class="relative">
+          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-pink-400 text-sm">📷</span>
+          <input 
+            type="url" 
+            id="instagramLink" 
+            name="instagram" 
+            value="{{ settings.get('instagram', '') }}" 
+            placeholder="https://instagram.com/corujaachou"
+            class="w-full bg-[#0a0c10] border border-[#232834] rounded-xl pl-9 pr-4 py-2.5 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-purple-500"
+          >
+        </div>
+      </div>
+
+      <!-- TikTok -->
+      <div>
+        <label for="tiktokLink" class="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1">
+          Link do TikTok
+        </label>
+        <div class="relative">
+          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-cyan-400 text-sm">🎵</span>
+          <input 
+            type="url" 
+            id="tiktokLink" 
+            name="tiktok" 
+            value="{{ settings.get('tiktok', '') }}" 
+            placeholder="https://tiktok.com/@corujaachou"
+            class="w-full bg-[#0a0c10] border border-[#232834] rounded-xl pl-9 pr-4 py-2.5 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-purple-500"
+          >
+        </div>
+      </div>
+
+      <!-- WhatsApp / Grupo VIP de Ofertas -->
+      <div>
+        <label for="whatsappLink" class="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1">
+          Link do Grupo / Canal de Ofertas no WhatsApp
+        </label>
+        <div class="relative">
+          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-400 text-sm">💬</span>
+          <input 
+            type="url" 
+            id="whatsappLink" 
+            name="whatsapp" 
+            value="{{ settings.get('whatsapp', '') }}" 
+            placeholder="https://chat.whatsapp.com/..."
+            class="w-full bg-[#0a0c10] border border-[#232834] rounded-xl pl-9 pr-4 py-2.5 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-purple-500"
+          >
+        </div>
+      </div>
+
+    </div>
+
+    <div class="pt-4 flex justify-end">
+      <button 
+        type="submit" 
+        class="px-6 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs shadow-xl shadow-purple-600/30 transition-all flex items-center gap-2"
+      >
+        <span>💾</span>
+        <span>Salvar Configurações</span>
+      </button>
+    </div>
+
+  </form>
+
+  <!-- Change Password Form -->
+  <form method="POST" action="/admin/settings" class="space-y-4 bg-[#12151c] p-6 sm:p-8 rounded-3xl border border-[#232834] shadow-2xl">
+    <input type="hidden" name="action" value="change_password">
+
+    <h2 class="text-sm font-bold uppercase tracking-wider text-amber-400 pb-2 border-b border-[#232834] flex items-center gap-2">
+      <span>🔒</span> Alterar Senha de Acesso
+    </h2>
+
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div>
+        <label for="currentPassword" class="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1">
+          Senha Atual
+        </label>
+        <input 
+          type="password" 
+          id="currentPassword" 
+          name="current_password" 
+          required
+          placeholder="••••••••"
+          class="w-full bg-[#0a0c10] border border-[#232834] rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-500"
+        >
+      </div>
+
+      <div>
+        <label for="newPassword" class="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1">
+          Nova Senha
+        </label>
+        <input 
+          type="password" 
+          id="newPassword" 
+          name="new_password" 
+          required
+          placeholder="••••••••"
+          class="w-full bg-[#0a0c10] border border-[#232834] rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-500"
+        >
+      </div>
+
+      <div>
+        <label for="confirmPassword" class="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1">
+          Confirmar Nova Senha
+        </label>
+        <input 
+          type="password" 
+          id="confirmPassword" 
+          name="confirm_password" 
+          required
+          placeholder="••••••••"
+          class="w-full bg-[#0a0c10] border border-[#232834] rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-500"
+        >
+      </div>
+    </div>
+
+    <div class="pt-2 flex justify-end">
+      <button 
+        type="submit" 
+        class="px-5 py-2 rounded-xl bg-[#1a1f2c] hover:bg-amber-950/40 text-amber-300 border border-amber-500/30 font-bold text-xs transition-all"
+      >
+        Atualizar Senha
+      </button>
+    </div>
+  </form>
+
+</div>
+{% endblock %}

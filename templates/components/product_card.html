@@ -1,0 +1,118 @@
+<!-- Product Card Component -->
+<div class="product-card group flex flex-col bg-[#111318] rounded-2xl border border-[#242832] overflow-hidden hover:border-purple-500/50 transition-all duration-300 relative">
+  
+  <!-- Image Container -->
+  <a href="/produto/{{ product.slug }}" class="relative block w-full aspect-square overflow-hidden bg-[#08090C]">
+    <img 
+      src="{{ product.image }}" 
+      alt="{{ product.name }}" 
+      loading="lazy"
+      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+      onerror="this.src='https://images.unsplash.com/photo-1526738549149-8e07eca6c147?w=600&auto=format&fit=crop&q=80';"
+    >
+
+    <!-- Top Floating Badges -->
+    <div class="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between gap-1 pointer-events-none">
+      <div class="flex flex-wrap gap-1">
+        {% if product.trending %}
+        <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-amber-500/90 text-zinc-950 shadow-md backdrop-blur-sm flex items-center gap-0.5">
+          <span>🔥</span> EM ALTA
+        </span>
+        {% elif product.featured %}
+        <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-purple-600/90 text-white shadow-md backdrop-blur-sm flex items-center gap-0.5">
+          <span>🦉</span> ACHADO
+        </span>
+        {% endif %}
+      </div>
+
+      {% if product.discount and product.discount > 0 %}
+      <span class="px-2 py-0.5 rounded-full text-[11px] font-black bg-rose-600/95 text-white shadow-md backdrop-blur-sm">
+        -{{ product.discount }}%
+      </span>
+      {% endif %}
+    </div>
+
+    <!-- Category Pill Tag -->
+    <div class="absolute bottom-2.5 left-2.5 pointer-events-none">
+      <span class="px-2 py-0.5 rounded-md text-[10px] font-medium bg-[#08090C]/80 text-zinc-300 backdrop-blur-sm border border-[#242832]/80">
+        {{ product.category_icon }} {{ product.category_name }}
+      </span>
+    </div>
+  </a>
+
+  <!-- Content Body -->
+  <div class="p-3.5 sm:p-4 flex flex-col flex-1 justify-between gap-3">
+    
+    <div>
+      <!-- Rating & Sales -->
+      <div class="flex items-center justify-between text-[11px] text-zinc-400 mb-1.5">
+        <div class="flex items-center gap-1 text-amber-400 font-bold">
+          <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <span>{{ "%.1f"|format(product.rating) }}</span>
+        </div>
+        {% if product.sales_count and product.sales_count > 0 %}
+        <span class="text-zinc-500 font-medium">
+          +{{ product.sales_count }} vendidos
+        </span>
+        {% endif %}
+      </div>
+
+      <!-- Product Title -->
+      <a href="/produto/{{ product.slug }}" class="block">
+        <h3 class="text-xs sm:text-sm font-semibold text-zinc-100 group-hover:text-purple-300 transition-colors line-clamp-2 leading-snug" title="{{ product.name }}">
+          {{ product.name }}
+        </h3>
+      </a>
+    </div>
+
+    <!-- Score da Coruja (Visual Meter & Metric) -->
+    <div class="pt-2 border-t border-[#242832]/60">
+      <div class="flex items-center justify-between text-[11px] mb-1">
+        <span class="text-zinc-400 font-medium flex items-center gap-1">
+          <span>🦉</span> Score:
+        </span>
+        <span class="font-mono font-bold text-amber-400 text-xs">
+          {{ product.trend_score }}/100
+        </span>
+      </div>
+      <!-- Styled visual bar -->
+      <div class="w-full h-1.5 bg-[#242832] rounded-full overflow-hidden">
+        <div 
+          class="h-full bg-gradient-to-r from-amber-400 to-purple-500 rounded-full" 
+          style="width: {{ product.trend_score }}%;"
+        ></div>
+      </div>
+      <!-- ASCII block representation for quick glance -->
+      <div class="text-[9px] font-mono text-zinc-500 tracking-tighter mt-0.5 hidden sm:block select-none">
+        {{ product.trend_score | score_bar(10) }}
+      </div>
+    </div>
+
+    <!-- Pricing & Action Button -->
+    <div class="pt-1 flex flex-col gap-2">
+      <div class="flex items-baseline gap-2">
+        <span class="text-base sm:text-lg font-black text-white tracking-tight">
+          {{ product.price | currency }}
+        </span>
+        {% if product.old_price and product.old_price > product.price %}
+        <span class="text-xs text-zinc-500 line-through">
+          {{ product.old_price | currency }}
+        </span>
+        {% endif %}
+      </div>
+
+      <!-- Action Button -->
+      <a 
+        href="{{ product.affiliate_url }}" 
+        target="_blank" 
+        rel="noopener noreferrer nofollow"
+        class="w-full py-2 sm:py-2.5 px-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs sm:text-sm text-center shadow-lg shadow-purple-600/20 active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 group/btn"
+      >
+        <span>VER OFERTA</span>
+        <svg class="w-3.5 h-3.5 group-hover/btn:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+      </a>
+    </div>
+
+  </div>
+
+</div>

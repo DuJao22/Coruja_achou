@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ category.name }} | CORUJA ACHOU{% endblock %}
+{% block meta_description %}{{ category.description or 'Confira os melhores achadinhos e ofertas selecionadas da categoria ' + category.name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+  <!-- Category Pills Bar -->
+  <div>
+    {% include 'components/category_pills.html' %}
+  </div>
+
+  <!-- Category Banner Header -->
+  <div class="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-[#111318] via-[#171a22] to-[#111318] border border-[#242832] relative overflow-hidden">
+    <div class="max-w-2xl relative z-10">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-semibold mb-3">
+        <span>{{ category.icon }}</span>
+        <span>Categoria Oficial</span>
+      </div>
+      <h1 class="text-2xl sm:text-4xl font-extrabold text-white tracking-tight mb-2">
+        {{ category.name }}
+      </h1>
+      <p class="text-sm sm:text-base text-zinc-400 mb-4 leading-relaxed">
+        {{ category.description or 'Descubra os produtos mais interessantes e bem avaliados desta categoria.' }}
+      </p>
+      <div class="flex items-center gap-4 text-xs text-zinc-400">
+        <span class="flex items-center gap-1">
+          <span class="font-bold text-white">{{ products|length }}</span> produtos encontrados
+        </span>
+      </div>
+    </div>
+    <!-- Decorative Ambient Glow -->
+    <div class="absolute right-0 top-0 bottom-0 w-64 bg-purple-600/10 blur-3xl pointer-events-none"></div>
+  </div>
+
+  <!-- Filters & Sorting Bar -->
+  <div class="p-4 rounded-2xl bg-[#111318] border border-[#242832] flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+    
+    <!-- Quick filter chips -->
+    <div class="flex flex-wrap items-center gap-2 text-xs">
+      <span class="text-zinc-500 font-semibold mr-1">Filtrar:</span>
+      
+      <!-- Destaques -->
+      <a 
+        href="?ordenar={{ current_sort }}&destaque={{ '0' if only_featured else '1' }}{{ '&em_alta=1' if only_trending else '' }}"
+        class="px-3 py-1.5 rounded-lg border font-medium transition-all {{ 'bg-purple-600/20 text-purple-300 border-purple-500/40' if only_featured else 'bg-[#08090C] text-zinc-400 border-[#242832] hover:border-zinc-700' }}"
+      >
+        <span>🦉</span> Destaques
+      </a>
+
+      <!-- Em Alta -->
+      <a 
+        href="?ordenar={{ current_sort }}&em_alta={{ '0' if only_trending else '1' }}{{ '&destaque=1' if only_featured else '' }}"
+        class="px-3 py-1.5 rounded-lg border font-medium transition-all {{ 'bg-amber-500/20 text-amber-300 border-amber-500/40' if only_trending else 'bg-[#08090C] text-zinc-400 border-[#242832] hover:border-zinc-700' }}"
+      >
+        <span>🔥</span> Em Alta
+      </a>
+
+      <!-- Reset Filters if applied -->
+      {% if only_featured or only_trending or request.args.get('avaliacao') or request.args.get('score') %}
+      <a href="/categoria/{{ category.slug }}" class="px-2.5 py-1.5 rounded-lg text-rose-400 hover:text-rose-300 transition-colors">
+        Limpar filtros ✕
+      </a>
+      {% endif %}
+    </div>
+
+    <!-- Sorting Dropdown -->
+    <form method="GET" class="flex items-center gap-2 shrink-0">
+      {% if only_featured %}
+      <input type="hidden" name="destaque" value="1">
+      {% endif %}
+      {% if only_trending %}
+      <input type="hidden" name="em_alta" value="1">
+      {% endif %}
+      
+      <label for="sortSelect" class="text-xs text-zinc-400 font-medium">Ordenar por:</label>
+      <select 
+        id="sortSelect" 
+        name="ordenar" 
+        onchange="this.form.submit()"
+        class="bg-[#08090C] border border-[#242832] rounded-xl text-xs text-zinc-200 py-2 px-3 focus:outline-none focus:border-purple-500"
+      >
+        <option value="newest" {{ 'selected' if current_sort == 'newest' else '' }}>Mais recentes</option>
+        <option value="score" {{ 'selected' if current_sort == 'score' else '' }}>Maior Score da Coruja 🦉</option>
+        <option value="popular" {{ 'selected' if current_sort == 'popular' else '' }}>Mais populares / vendas</option>
+        <option value="discount" {{ 'selected' if current_sort == 'discount' else '' }}>Maior desconto %</option>
+        <option value="price_asc" {{ 'selected' if current_sort == 'price_asc' else '' }}>Menor preço</option>
+        <option value="price_desc" {{ 'selected' if current_sort == 'price_desc' else '' }}>Maior preço</option>
+      </select>
+    </form>
+
+  </div>
+
+  <!-- Products Grid -->
+  {% if products %}
+  <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3.5 sm:gap-6">
+    {% for product in products %}
+      {% include 'components/product_card.html' %}
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="p-12 text-center bg-[#111318] rounded-3xl border border-[#242832] max-w-md mx-auto my-12 space-y-4">
+    <div class="text-4xl">🦉</div>
+    <h3 class="text-lg font-bold text-white">Nenhum produto encontrado</h3>
+    <p class="text-sm text-zinc-400">
+      Ainda não há produtos com os filtros selecionados nesta categoria.
+    </p>
+    <a href="/categoria/{{ category.slug }}" class="inline-block px-5 py-2.5 rounded-xl bg-purple-600 text-white text-xs font-bold hover:bg-purple-500 transition-colors">
+      Ver todos de {{ category.name }}
+    </a>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

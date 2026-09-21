@@ -1,0 +1,235 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block title %}Gerenciar Produtos | CORUJA ACHOU ADMIN{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+  <!-- Header & Add Button -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-[#232834]">
+    <div>
+      <h1 class="text-2xl font-extrabold text-white tracking-tight flex items-center gap-2">
+        <span>📦</span>
+        <span>Catálogo de Produtos</span>
+      </h1>
+      <p class="text-xs text-zinc-400 mt-1">
+        {{ products|length }} produto(s) exibidos com base nos filtros atuais.
+      </p>
+    </div>
+
+    <a 
+      href="/admin/products/new" 
+      class="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-purple-600/30 transition-all flex items-center justify-center gap-2"
+    >
+      <span>+</span>
+      <span>ADICIONAR PRODUTO</span>
+    </a>
+  </div>
+
+  <!-- Filters & Search Bar -->
+  <form method="GET" action="/admin/products" class="p-4 rounded-2xl bg-[#12151c] border border-[#232834] space-y-3">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
+      
+      <!-- Search Field -->
+      <div class="md:col-span-2">
+        <label class="block text-[10px] uppercase font-bold text-zinc-400 mb-1">Buscar por nome ou descrição</label>
+        <input 
+          type="text" 
+          name="q" 
+          value="{{ search_query }}" 
+          placeholder="ex: projetor, fone, suporte..." 
+          class="w-full bg-[#0a0c10] border border-[#232834] rounded-xl px-3 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-purple-500"
+        >
+      </div>
+
+      <!-- Category Filter -->
+      <div>
+        <label class="block text-[10px] uppercase font-bold text-zinc-400 mb-1">Categoria</label>
+        <select name="categoria" onchange="this.form.submit()" class="w-full bg-[#0a0c10] border border-[#232834] rounded-xl px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-purple-500">
+          <option value="">Todas as categorias</option>
+          {% for cat in categories %}
+          <option value="{{ cat.id }}" {{ 'selected' if current_cat == cat.id|string else '' }}>
+            {{ cat.icon }} {{ cat.name }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Status Filter -->
+      <div>
+        <label class="block text-[10px] uppercase font-bold text-zinc-400 mb-1">Status</label>
+        <select name="status" onchange="this.form.submit()" class="w-full bg-[#0a0c10] border border-[#232834] rounded-xl px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-purple-500">
+          <option value="">Todos</option>
+          <option value="active" {{ 'selected' if current_status == 'active' else '' }}>Ativos na vitrine</option>
+          <option value="inactive" {{ 'selected' if current_status == 'inactive' else '' }}>Inativos</option>
+        </select>
+      </div>
+
+      <!-- Badge Filter -->
+      <div>
+        <label class="block text-[10px] uppercase font-bold text-zinc-400 mb-1">Destaques / Em Alta</label>
+        <select name="destaque" onchange="this.form.submit()" class="w-full bg-[#0a0c10] border border-[#232834] rounded-xl px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-purple-500">
+          <option value="">Todos os tipos</option>
+          <option value="1" {{ 'selected' if current_featured == '1' else '' }}>🦉 Apenas Destaques</option>
+        </select>
+      </div>
+
+    </div>
+
+    <!-- Filter Buttons Row -->
+    <div class="flex items-center justify-between pt-2 text-xs">
+      <div class="flex items-center gap-2">
+        <button type="submit" class="px-3 py-1.5 rounded-lg bg-[#1a1f2c] text-zinc-200 border border-[#232834] hover:bg-[#232834] font-medium">
+          Filtrar
+        </button>
+        {% if search_query or current_cat or current_status or current_featured or current_trending %}
+        <a href="/admin/products" class="text-rose-400 hover:text-rose-300">
+          Limpar filtros ✕
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </form>
+
+  <!-- Products Table -->
+  <div class="rounded-2xl bg-[#12151c] border border-[#232834] overflow-hidden shadow-xl">
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-xs text-zinc-300">
+        <thead class="text-[11px] uppercase tracking-wider text-zinc-400 bg-[#0a0c10] border-b border-[#232834]">
+          <tr>
+            <th class="p-3.5">Imagem</th>
+            <th class="p-3.5">Nome / Slug</th>
+            <th class="p-3.5">Categoria</th>
+            <th class="p-3.5">Preço</th>
+            <th class="p-3.5">Score</th>
+            <th class="p-3.5">Badges</th>
+            <th class="p-3.5">Status</th>
+            <th class="p-3.5 text-right">Ações</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-[#232834]">
+          {% for p in products %}
+          <tr class="hover:bg-[#1a1f2c]/40 transition-colors">
+            
+            <!-- Imagem -->
+            <td class="p-3.5 w-14">
+              <a href="/produto/{{ p.slug }}" target="_blank">
+                <img 
+                  src="{{ p.image }}" 
+                  alt="{{ p.name }}" 
+                  class="w-12 h-12 rounded-xl object-cover bg-black border border-[#232834] hover:border-purple-500 transition-colors"
+                  onerror="this.src='/static/images/coruja-logo.svg';"
+                >
+              </a>
+            </td>
+
+            <!-- Nome & Link -->
+            <td class="p-3.5 max-w-xs">
+              <a href="/produto/{{ p.slug }}" target="_blank" class="font-bold text-white hover:text-purple-400 line-clamp-1">
+                {{ p.name }}
+              </a>
+              <span class="text-[10px] font-mono text-zinc-500 block truncate">
+                /produto/{{ p.slug }}
+              </span>
+            </td>
+
+            <!-- Categoria -->
+            <td class="p-3.5 whitespace-nowrap">
+              <span class="px-2 py-1 rounded-md bg-[#0a0c10] border border-[#232834] text-zinc-300">
+                {{ p.category_icon }} {{ p.category_name }}
+              </span>
+            </td>
+
+            <!-- Preço -->
+            <td class="p-3.5 whitespace-nowrap">
+              <div class="font-mono font-bold text-white">
+                {{ p.price | currency }}
+              </div>
+              {% if p.discount and p.discount > 0 %}
+              <span class="text-[10px] font-black text-rose-400">
+                -{{ p.discount }}%
+              </span>
+              {% endif %}
+            </td>
+
+            <!-- Score -->
+            <td class="p-3.5 whitespace-nowrap">
+              <div class="flex items-center gap-1 font-mono font-bold text-amber-400">
+                <span>🦉</span> {{ p.trend_score }}
+              </div>
+              <div class="text-[8px] font-mono text-zinc-600">
+                {{ p.trend_score | score_bar(6) }}
+              </div>
+            </td>
+
+            <!-- Badges -->
+            <td class="p-3.5 whitespace-nowrap">
+              <div class="flex flex-col gap-1">
+                {% if p.featured %}
+                <span class="text-[10px] px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 font-bold border border-purple-500/30 text-center">
+                  Destaque
+                </span>
+                {% endif %}
+                {% if p.trending %}
+                <span class="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30 text-center">
+                  Em Alta
+                </span>
+                {% endif %}
+                {% if not p.featured and not p.trending %}
+                <span class="text-[10px] text-zinc-500">-</span>
+                {% endif %}
+              </div>
+            </td>
+
+            <!-- Status Ativar / Desativar -->
+            <td class="p-3.5 whitespace-nowrap">
+              <form action="/admin/products/{{ p.id }}/toggle" method="POST">
+                <button type="submit" class="btn-toggle-active" title="Clique para alternar">
+                  {% if p.active %}
+                  <span class="status-badge px-2.5 py-1 text-xs font-semibold rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-colors">
+                    Ativo
+                  </span>
+                  {% else %}
+                  <span class="status-badge px-2.5 py-1 text-xs font-semibold rounded-full bg-zinc-500/10 text-zinc-400 border border-zinc-500/20 hover:bg-zinc-500/20 transition-colors">
+                    Inativo
+                  </span>
+                  {% endif %}
+                </button>
+              </form>
+            </td>
+
+            <!-- Ações: Editar / Excluir -->
+            <td class="p-3.5 text-right whitespace-nowrap space-x-1">
+              <a 
+                href="/admin/products/{{ p.id }}/edit" 
+                class="px-2.5 py-1.5 rounded-lg bg-[#0a0c10] hover:bg-purple-950/40 text-zinc-300 hover:text-purple-300 border border-[#232834] transition-all inline-block"
+                title="Editar Produto"
+              >
+                ✏️ Editar
+              </a>
+              <form action="/admin/products/{{ p.id }}/delete" method="POST" class="inline" onsubmit="return confirm('Tem certeza que deseja excluir o produto \'{{ p.name }}\'?');">
+                <button 
+                  type="submit" 
+                  class="px-2.5 py-1.5 rounded-lg bg-[#0a0c10] hover:bg-rose-950/40 text-zinc-300 hover:text-rose-400 border border-[#232834] transition-all"
+                  title="Excluir"
+                >
+                  🗑️
+                </button>
+              </form>
+            </td>
+
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="8" class="p-8 text-center text-zinc-500 text-sm">
+              Nenhum produto cadastrado com os critérios selecionados.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
